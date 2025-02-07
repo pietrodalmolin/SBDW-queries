@@ -1,0 +1,62 @@
+SELECT
+
+--DIMENSIONS
+reportingdate														-- Date
+,BetKey																-- ID for bets
+,CouponID															-- ID for coupons
+,CustomerKey														-- ID for customers -- KEY to DW.Customer
+,SegmentKey															-- KEY to DW.Segment
+,IsMobileBet														-- Device
+,IsLiveBet															-- MarketType
+,NumberOfSelections													-- BetType, 1=single 2=combi
+,CouponTypeKey														-- KEY to DW.CouponType
+,BetSettledStatus													-- KEY to DW.SettledStatus
+,BetStakeEURBucketKey												-- KEY to DW.BucketBetStake
+,SelectionsBucket													-- KEY to DW.BucketSelections
+,CashoutParticipation												-- KEY to DW.VW_CashoutParticipation
+,NumberofPartialCashout												-- Number of Partial Cashouts
+,CASE WHEN MAX(BetSelectionTypeKey)>1 
+	THEN 2 ELSE 1 END AS BetSelectionTypeKey						-- KEY to DW.BetSelectionType
+,BonusTypeKey														-- KEY to DW.BonusType
+,CASE WHEN numberofselections=1 AND CouponTypeKey=1 
+	THEN BetGroupKey ELSE 0 END AS BetGroupKey_Singles				-- KEY to DW.BetGroup
+,CustomerClassificationAtBetPlacement								-- KEY to DW.CustomerAccountClassification
+	
+--MEASURES
+	,EXP(SUM(LOG(NULLIF(BetSelectionOdds, 0)))) AS Odds				
+	,SUM(BSStandardSettledStake) AS StandardSettledStake
+	,SUM(BSRewardSettledStake) AS RewardSettledStake
+	,SUM(BSStandardVoidedStake) AS StandardVoidedStake
+	,SUM(BSRewardVoidedStake) AS RewardVoidedStake
+	,SUM(CashoutStakeValue) AS CashoutStakeValue
+	,SUM(BSStandardPayout) AS StandardPayout
+	,SUM(BSRewardPayout) AS RewardPayout
+	,SUM(BSCashout) AS CashoutPayout
+	,SUM(BSProfit) AS Profit
+	,SUM(BSRevenue) AS Revenue	
+
+FROM MARTCUBE.BetSelectionFlat WITH(NOLOCK)
+WHERE 
+    betsettledstatus IN (3, 4, 5, 6, 7)
+    AND AccountTypeKey = 1
+	AND ReportingDate='2025-01-01'
+
+GROUP BY
+reportingdate														-- Date
+,BetKey																-- ID for bets
+,CouponID															-- ID for coupons
+,CustomerKey														-- ID for customers -- KEY to DW.Customer
+,SegmentKey															-- KEY to DW.Segment
+,BetSettledStatus													-- KEY to DW.SettledStatus
+,BetStakeEURBucketKey												-- KEY to DW.BucketBetStake
+,NumberOfSelections													-- BetType, 1=single 2=combi
+,CouponTypeKey														-- KEY to DW.CouponType
+,IsMobileBet														-- Device
+,IsLiveBet															-- MarketType
+,SelectionsBucket													-- KEY to DW.BucketSelections
+,CashoutParticipation												-- KEY to DW.VW_CashoutParticipation
+,NumberofPartialCashout												-- Number of Partial Cashouts
+,CustomerClassificationAtBetPlacement								-- KEY to DW.CustomerAccountClassification
+,BonusTypeKey														-- KEY to DW.BonusType
+,CASE WHEN numberofselections=1 AND CouponTypeKey=1 
+	THEN BetGroupKey ELSE 0 END
