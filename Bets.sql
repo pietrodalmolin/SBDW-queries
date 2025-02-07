@@ -1,11 +1,11 @@
 SELECT
-
 --DIMENSIONS
 reportingdate														-- Date
 ,BetKey																-- ID for bets
 ,CouponID															-- ID for coupons
-,CustomerKey														-- ID for customers -- KEY to DW.Customer
-,SegmentKey															-- KEY to DW.Segment
+,b.CustomerKey														-- ID for customers -- KEY to DW.Customer
+,b.SegmentKey														-- KEY to DW.Segment
+,c.CountryKey														-- KEY to DW.Country
 ,IsMobileBet														-- Device
 ,IsLiveBet															-- MarketType
 ,NumberOfSelections													-- BetType, 1=single 2=combi
@@ -35,18 +35,20 @@ reportingdate														-- Date
 	,SUM(BSProfit) AS Profit
 	,SUM(BSRevenue) AS Revenue	
 
-FROM MARTCUBE.BetSelectionFlat WITH(NOLOCK)
+FROM MARTCUBE.BetSelectionFlat b WITH(NOLOCK) 
+INNER JOIN dw.Customer c WITH(NOLOCK) ON b.customerkey = c.customerkey --WITH(NOLOCK)
 WHERE 
     betsettledstatus IN (3, 4, 5, 6, 7)
-    AND AccountTypeKey = 1
+    AND b.AccountTypeKey = 1
 	AND ReportingDate='2025-01-01'
 
 GROUP BY
 reportingdate														-- Date
 ,BetKey																-- ID for bets
 ,CouponID															-- ID for coupons
-,CustomerKey														-- ID for customers -- KEY to DW.Customer
-,SegmentKey															-- KEY to DW.Segment
+,CountryKey															-- KEY to DW.Country
+,b.CustomerKey														-- ID for customers -- KEY to DW.Customer
+,b.SegmentKey															-- KEY to DW.Segment
 ,BetSettledStatus													-- KEY to DW.SettledStatus
 ,BetStakeEURBucketKey												-- KEY to DW.BucketBetStake
 ,NumberOfSelections													-- BetType, 1=single 2=combi
