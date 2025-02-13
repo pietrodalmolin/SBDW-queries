@@ -31,7 +31,7 @@ reportingdate														-- Date
 
 
 FROM MARTCUBE.BetSelectionFlat s
-INNER JOIN dw.Customer c WITH(NOLOCK) ON b.customerkey = c.customerkey --WITH(NOLOCK)
+INNER JOIN dw.Customer c WITH(NOLOCK) ON s.customerkey = c.customerkey --WITH(NOLOCK)
 
 WHERE 
 betsettledstatus IN (3, 4, 5, 6, 7)
