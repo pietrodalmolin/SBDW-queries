@@ -13,7 +13,7 @@ IsLiveBet, '|',
 NumberOfSelections, '|',
 CouponTypeKey, '|',
 BSSettledStatus, '|',
-CASE WHEN MAX(BetSelectionTypeKey) > 1 THEN 2 ELSE 1 END, '|',
+BetSelectionTypeKey, '|',
 BonusTypeKey, '|',
 CashoutParticipation)), 2) 
 AS key_betdetails
