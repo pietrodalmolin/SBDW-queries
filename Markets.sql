@@ -1,28 +1,27 @@
 SELECT
-
 --DIMENSIONS
-reportingdate                                             -- Date
+reportingdate														-- Date
 ,CONVERT(VARCHAR(64), HASHBYTES('SHA2_256', 
-  CONCAT(
-      COALESCE(s.SegmentKey, ''), '|',                    -- KEY to DW.Segment
-      COALESCE(c.CountryKey, '')                          -- Country
-  )), 2) AS key_geo
+CONCAT(
+s.SegmentKey, '|',                    -- KEY to DW.Segment
+c.CountryKey                          -- Country
+)), 2) AS key_geo
 ,CONVERT(VARCHAR(64), HASHBYTES('SHA2_256', 
-    CONCAT(
-        IsMobileBet, '|',                                  -- Device               
-        IsLiveBet, '|',                                    -- MarketType 
-        NumberOfSelections, '|',                           -- BetType, 1=single 2=combi
-        c.CouponTypeKey, '|',                              -- KEY to DW.CouponType 
-        s.BSSettledStatus, '|',                            -- KEY to DW.SettledStatus
-        bst.BetSelectionTypeKey, '|',                      -- KEY to DW.BetSelectionType
-        bt.BonusTypeKey, '|',                              -- KEY to DW.BonusType
-        s.CustomerClassificationAtBetPlacement, '|',       -- KEY to DW.CustomerAccountClassification 
-        s.BetSelectionOddsBucketKey                        -- KEY to DW.BucketBetSelectionOdds
-    ))
-), 2) AS key_marketdetails						
-,s.BetSelectionOdds													                -- Odds
-,s.EventKey															                    -- KEY to DW.Event
-,BetGroupKey														                    -- KEY to DW.BetGroup
+CONCAT(
+IsMobileBet, '|',                                  -- Device               
+IsLiveBet, '|',                                    -- MarketType 
+NumberOfSelections, '|',                           -- BetType, 1=single 2=combi
+CouponTypeKey, '|',                              -- KEY to DW.CouponType 
+BSSettledStatus, '|',                            -- KEY to DW.SettledStatus
+BetSelectionTypeKey, '|',                      -- KEY to DW.BetSelectionType
+BonusTypeKey, '|',                              -- KEY to DW.BonusType
+CustomerClassificationAtBetPlacement, '|',       -- KEY to DW.CustomerAccountClassification 
+BetSelectionOddsBucketKey, ''                     -- KEY to DW.BucketBetSelectionOdds
+)
+), 2) AS key_marketdetails
+,s.BetSelectionOdds													-- Odds
+,s.EventKey															-- KEY to DW.Event
+,BetGroupKey														-- KEY to DW.BetGroup
 
 --MEASURES		
 ,SUM(BSStandardSettledStake) AS StandardSettledStake
