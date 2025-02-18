@@ -3,23 +3,22 @@ SELECT
 reportingdate														-- Date
 ,CONVERT(VARCHAR(64), HASHBYTES('SHA2_256', 
 CONCAT(
-s.SegmentKey, '|',                    -- KEY to DW.Segment
-c.CountryKey                          -- Country
-)), 2) AS key_geo
+s.SegmentKey, '|', 
+c.CountryKey)), 2) 
+AS key_geo
 ,CONVERT(VARCHAR(64), HASHBYTES('SHA2_256', 
 CONCAT(
-IsMobileBet, '|',                                  -- Device               
-IsLiveBet, '|',                                    -- MarketType 
-NumberOfSelections, '|',                           -- BetType, 1=single 2=combi
-CouponTypeKey, '|',                              -- KEY to DW.CouponType 
-BSSettledStatus, '|',                            -- KEY to DW.SettledStatus
-BetSelectionTypeKey, '|',                      -- KEY to DW.BetSelectionType
-BonusTypeKey, '|',                              -- KEY to DW.BonusType
-CustomerClassificationAtBetPlacement, '|',       -- KEY to DW.CustomerAccountClassification 
-BetSelectionOddsBucketKey, ''                     -- KEY to DW.BucketBetSelectionOdds
-)
-), 2) AS key_marketdetails
+IsMobileBet, '|', 
+IsLiveBet, '|',
+NumberOfSelections, '|',
+CouponTypeKey, '|',
+BSSettledStatus, '|',
+CASE WHEN MAX(BetSelectionTypeKey) > 1 THEN 2 ELSE 1 END, '|',
+BonusTypeKey, '|',
+CashoutParticipation)), 2) 
+AS key_betdetails
 ,s.BetSelectionOdds													-- Odds
+,BetSelectionOddsBucketKey
 ,s.EventKey															-- KEY to DW.Event
 ,BetGroupKey														-- KEY to DW.BetGroup
 
@@ -34,7 +33,6 @@ BetSelectionOddsBucketKey, ''                     -- KEY to DW.BucketBetSelectio
 ,SUM(BSCashout) AS CashoutPayout
 ,SUM(BSProfit) AS Profit
 ,SUM(BSRevenue) AS Revenue	
-
 
 FROM MARTCUBE.BetSelectionFlat s
 INNER JOIN dw.Customer c WITH(NOLOCK) ON s.customerkey = c.customerkey --WITH(NOLOCK)
@@ -60,3 +58,4 @@ reportingdate														-- Date
 ,s.CustomerClassificationAtBetPlacement								-- KEY to DW.CustomerAccountClassification
 ,BetSelectionTypeKey												-- KEY to DW.BetSelectionType
 ,BonusTypeKey														-- KEY to DW.BonusType
+,CashoutParticipation
