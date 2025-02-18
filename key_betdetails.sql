@@ -1,37 +1,37 @@
 SELECT 
-CONVERT(VARCHAR(64), HASHBYTES('SHA2_256', 
-CONCAT(
-IsMobileBet, '|', 
-IsLiveBet, '|',
-NumberOfSelections, '|',
-CouponTypeKey, '|',
-SettledStatusKey, '|',
-BetSelectionTypeKey, '|',
-BonusTypeKey, '|',
-CashoutParticipationKey
-)
-), 2) AS key_betdetails,
-IsMobileBet,
-IsLiveBet,
-NumberOfSelections,
-CouponTypeKey,
-SettledStatusKey,
-BetSelectionTypeKey,
-BonusTypeKey,
-CashoutParticipationKey
+    CONVERT(VARCHAR(64), HASHBYTES('SHA2_256', 
+        CONCAT(
+            IsMobileBet, '|', 
+            IsLiveBet, '|',
+            NumberOfSelections, '|',
+            CouponTypeKey, '|',
+            SettledStatusKey, '|',
+            BetSelectionTypeKey, '|',
+            BonusTypeKey, '|',
+            CashoutParticipationKey
+        )
+    ), 2) AS key_betdetails,
+    IsMobileBet,
+    IsLiveBet,
+    NumberOfSelections,
+    CouponTypeKey,
+    SettledStatusKey,
+    BetSelectionTypeKey,
+    BonusTypeKey,
+    CashoutParticipationKey
 FROM 
-(SELECT 0 AS IsMobileBet UNION ALL SELECT 1) AS IsMobileBet
+    (SELECT 0 AS IsMobileBet UNION ALL SELECT 1) AS IsMobileBet
 CROSS JOIN 
-(SELECT 0 AS IsLiveBet UNION ALL SELECT 1) AS IsLiveBet
+    (SELECT 0 AS IsLiveBet UNION ALL SELECT 1) AS IsLiveBet
 CROSS JOIN 
-(SELECT 1 AS NumberOfSelections UNION ALL SELECT 2) AS NumberOfSelections
+    (SELECT 1 AS NumberOfSelections UNION ALL SELECT 2) AS NumberOfSelections
 CROSS JOIN 
-(SELECT DISTINCT CouponTypeKey FROM DW.CouponType) AS CouponTypeKey
+    (SELECT DISTINCT CouponTypeKey FROM DW.CouponType) AS CouponTypeKey
 CROSS JOIN 
-(SELECT DISTINCT SettledStatusKey FROM DW.SettledStatus WHERE SettledStatusKey IN (3, 4, 5, 6, 7)) AS SettledStatusKey
+    (SELECT DISTINCT SettledStatusKey FROM DW.SettledStatus WHERE SettledStatusKey IN (3, 4, 5, 6, 7)) AS SettledStatusKey
 CROSS JOIN 
-(SELECT DISTINCT BetSelectionTypeKey FROM DW.BetSelectionType) AS BetSelectionTypeKey
+    (SELECT DISTINCT BetSelectionTypeKey FROM DW.BetSelectionType) AS BetSelectionTypeKey
 CROSS JOIN 
-(SELECT DISTINCT BonusTypeKey FROM DW.BonusType) AS BonusTypeKey
+    (SELECT DISTINCT BonusTypeKey FROM DW.BonusType UNION ALL SELECT 0) AS BonusTypeKey  -- Adding BonusTypeKey = 0 here
 CROSS JOIN 
-(SELECT DISTINCT CashoutParticipationKey FROM DW.VW_CashoutParticipation) AS CashoutParticipationKey
+    (SELECT DISTINCT CashoutParticipationKey FROM DW.VW_CashoutParticipation) AS CashoutParticipationKey;
