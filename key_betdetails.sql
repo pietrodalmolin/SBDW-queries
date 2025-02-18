@@ -1,22 +1,24 @@
 SELECT 
-CONVERT(VARCHAR(64), HASHBYTES('SHA2_256', 
-CONCAT(
-IsMobileBet, '|', 
-IsLiveBet, '|',
-NumberOfSelections, '|',
-CouponTypeKey, '|',
-BetSettledStatus, '|',
-BetSelectionTypeKey, '|',
-BonusTypeKey
-)
-), 2) AS key_betdetails,
-IsMobileBet,
-IsLiveBet,
-NumberOfSelections,
-CouponTypeKey,
-BetSettledStatus,
-BetSelectionTypeKey,
-BonusTypeKey
+    CONVERT(VARCHAR(64), HASHBYTES('SHA2_256', 
+        CONCAT(
+            IsMobileBet, '|', 
+            IsLiveBet, '|',
+            NumberOfSelections, '|',
+            CouponTypeKey, '|',
+            BetSettledStatus, '|',
+            BetSelectionTypeKey, '|',
+            BonusTypeKey, '|',
+            CashoutParticipation
+        )
+    ), 2) AS key_betdetails,
+    IsMobileBet,
+    IsLiveBet,
+    NumberOfSelections,
+    CouponTypeKey,
+    BetSettledStatus,
+    BetSelectionTypeKey,
+    BonusTypeKey,
+    CashoutParticipation
 FROM 
     (SELECT 0 AS IsMobileBet UNION ALL SELECT 1) AS IsMobileBet
 CROSS JOIN 
@@ -31,3 +33,5 @@ CROSS JOIN
     (SELECT DISTINCT BetSelectionTypeKey FROM DW.BetSelectionType) AS BetSelectionTypeKey
 CROSS JOIN 
     (SELECT DISTINCT BonusTypeKey FROM DW.BonusType) AS BonusTypeKey
+CROSS JOIN 
+    (SELECT DISTINCT CashoutParticipationKey AS CashoutParticipation FROM DW.VW_CashoutParticipation) AS CashoutParticipation
