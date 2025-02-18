@@ -1,11 +1,8 @@
 SELECT
 --DIMENSIONS
 reportingdate														-- Date
-,CONVERT(VARCHAR(64), HASHBYTES('SHA2_256', 
-CONCAT(
-s.SegmentKey, '|', 
-c.CountryKey)), 2) 
-AS key_geo
+,s.SegmentKey
+,CountryKey
 ,CONVERT(VARCHAR(64), HASHBYTES('SHA2_256', 
 CONCAT(
 IsMobileBet, '|', 
@@ -55,7 +52,6 @@ reportingdate														-- Date
 ,CouponTypeKey														-- KEY to DW.CouponType
 ,BetGroupKey														-- KEY to DW.BetGroup
 ,s.EventKey															-- KEY to DW.Event
-,s.CustomerClassificationAtBetPlacement								-- KEY to DW.CustomerAccountClassification
 ,BetSelectionTypeKey												-- KEY to DW.BetSelectionType
 ,BonusTypeKey														-- KEY to DW.BonusType
 ,CashoutParticipation
