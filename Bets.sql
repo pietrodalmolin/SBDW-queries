@@ -4,11 +4,8 @@ reportingdate														-- Date
 ,BetKey																-- ID for bets
 ,CouponID															-- ID for coupons
 ,b.CustomerKey														-- ID for customers -- KEY to DW.Customer
-,CONVERT(VARCHAR(64), HASHBYTES('SHA2_256', 
-CONCAT(
-b.SegmentKey, '|', 
-c.CountryKey)), 2) 
-AS key_geo
+,SegmentKey
+,CountryKey
 ,CONVERT(VARCHAR(64), HASHBYTES('SHA2_256', 
 CONCAT(
 IsMobileBet, '|', 
