@@ -26,26 +26,26 @@ BetStakeEURBucketKey, '|',
 SelectionsBucket)), 2) 
 AS key_betbucket
 ,CASE WHEN numberofselections=1 AND CouponTypeKey=1 THEN BetGroupKey ELSE 0 END AS BetGroupKey						-- KEY to DW.BetGroup
-	
+
 --MEASURES
-	,EXP(SUM(LOG(NULLIF(BetSelectionOdds, 0)))) AS Odds				
-	,SUM(BSStandardSettledStake) AS StandardSettledStake
-	,SUM(BSRewardSettledStake) AS RewardSettledStake
-	,SUM(BSStandardVoidedStake) AS StandardVoidedStake
-	,SUM(BSRewardVoidedStake) AS RewardVoidedStake
-	,SUM(CashoutStakeValue) AS CashoutStakeValue
-	,SUM(BSStandardPayout) AS StandardPayout
-	,SUM(BSRewardPayout) AS RewardPayout
-	,SUM(BSCashout) AS CashoutPayout
-	,SUM(BSProfit) AS Profit
-	,SUM(BSRevenue) AS Revenue	
+,EXP(SUM(LOG(NULLIF(BetSelectionOdds, 0)))) AS Odds				
+,SUM(BSStandardSettledStake) AS StandardSettledStake
+,SUM(BSRewardSettledStake) AS RewardSettledStake
+,SUM(BSStandardVoidedStake) AS StandardVoidedStake
+,SUM(BSRewardVoidedStake) AS RewardVoidedStake
+,SUM(CashoutStakeValue) AS CashoutStakeValue
+,SUM(BSStandardPayout) AS StandardPayout
+,SUM(BSRewardPayout) AS RewardPayout
+,SUM(BSCashout) AS CashoutPayout
+,SUM(BSProfit) AS Profit
+,SUM(BSRevenue) AS Revenue	
 
 FROM MARTCUBE.BetSelectionFlat b WITH(NOLOCK) 
 INNER JOIN dw.Customer c WITH(NOLOCK) ON b.customerkey = c.customerkey --WITH(NOLOCK)
 WHERE 
-    betsettledstatus IN (3, 4, 5, 6, 7)
-    AND b.AccountTypeKey = 1
-	AND ReportingDate='2024-11-01'
+betsettledstatus IN (3, 4, 5, 6, 7)
+AND b.AccountTypeKey = 1
+AND ReportingDate='2024-11-01'
 
 GROUP BY
 reportingdate														-- Date
