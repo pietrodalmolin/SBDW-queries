@@ -5,20 +5,20 @@ IsMobileBet, '|',
 IsLiveBet, '|',
 NumberOfSelections, '|',
 CouponTypeKey, '|',
-BetSettledStatus, '|',
+SettledStatusKey, '|',
 BetSelectionTypeKey, '|',
 BonusTypeKey, '|',
-CashoutParticipation
+CashoutParticipationKey
 )
 ), 2) AS key_betdetails,
 IsMobileBet,
 IsLiveBet,
 NumberOfSelections,
 CouponTypeKey,
-BetSettledStatus,
+SettledStatusKey,
 BetSelectionTypeKey,
 BonusTypeKey,
-CashoutParticipation
+CashoutParticipationKey
 FROM 
 (SELECT 0 AS IsMobileBet UNION ALL SELECT 1) AS IsMobileBet
 CROSS JOIN 
@@ -28,10 +28,10 @@ CROSS JOIN
 CROSS JOIN 
 (SELECT DISTINCT CouponTypeKey FROM DW.CouponType) AS CouponTypeKey
 CROSS JOIN 
-(SELECT DISTINCT SettledStatusKey AS BetSettledStatus FROM DW.SettledStatus WHERE SettledStatusKey IN (3, 4, 5, 6, 7)) AS BetSettledStatus
+(SELECT DISTINCT SettledStatusKey FROM DW.SettledStatus WHERE SettledStatusKey IN (3, 4, 5, 6, 7)) AS SettledStatusKey
 CROSS JOIN 
 (SELECT DISTINCT BetSelectionTypeKey FROM DW.BetSelectionType) AS BetSelectionTypeKey
 CROSS JOIN 
 (SELECT DISTINCT BonusTypeKey FROM DW.BonusType) AS BonusTypeKey
 CROSS JOIN 
-(SELECT DISTINCT CashoutParticipationKey AS CashoutParticipation FROM DW.VW_CashoutParticipation) AS CashoutParticipation
+(SELECT DISTINCT CashoutParticipationKey FROM DW.VW_CashoutParticipation) AS CashoutParticipationKey
