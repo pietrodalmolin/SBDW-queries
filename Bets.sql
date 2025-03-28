@@ -7,8 +7,7 @@ reportingdate
 ,key_betbucket
 ,BetGroupKey
 ,Odds
-,CAST(CONVERT(BIGINT, HASHBYTES('SHA2_256', CONVERT(VARCHAR(255), CouponID)), 1) AS BIGINT) as CouponID
-,COUNT(DISTINCT BetKey) AS Bets
+,COUNT(DISTINCT CouponID) as Coupons
 ,SUM(StandardSettledStake) AS StandardSettledStake
 ,SUM(RewardSettledStake) AS RewardSettledStake
 ,SUM(StandardVoidedStake) AS StandardVoidedStake
@@ -27,7 +26,6 @@ FROM
 reportingdate,  -- Date 
 b.CustomerKey,  -- ID for customers -- KEY to DW.Customer
 b.SegmentKey,
-b.BetKey,
 b.CouponID,
 CountryKey,
 CONVERT(VARCHAR(64), HASHBYTES('SHA2_256', 
@@ -65,13 +63,13 @@ INNER JOIN dw.Customer c WITH(NOLOCK) ON b.customerkey = c.customerkey
 WHERE 
 betsettledstatus IN (3, 4, 5, 6, 7)
 AND b.AccountTypeKey = 1
+AND CouponTypeKey=1
 
 GROUP BY
 reportingdate,  -- Date
 CountryKey,  -- KEY to DW.Country
 b.CustomerKey,  -- ID for customers -- KEY to DW.Customer
 b.SegmentKey,  -- KEY to DW.Segment
-b.BetKey,
 b.CouponID,
 BetSettledStatus,  -- KEY to DW.SettledStatus
 BetStakeEURBucketKey,  -- KEY to DW.BucketBetStake
@@ -87,7 +85,94 @@ CASE WHEN numberofselections = 1 AND CouponTypeKey = 1 THEN BetGroupKey ELSE 0 E
 GROUP BY
 reportingdate
 ,CustomerKey
-,CouponID
+,SegmentKey
+,CountryKey
+,key_betdetails
+,key_betbucket
+,BetGroupKey
+,Odds
+
+UNION ALL
+
+SELECT
+reportingdate
+,CustomerKey
+,SegmentKey
+,CountryKey
+,key_betdetails
+,key_betbucket
+,BetGroupKey
+,Odds
+,COUNT(DISTINCT CouponID) as Coupons
+,SUM(StandardSettledStake) AS StandardSettledStake
+,SUM(RewardSettledStake) AS RewardSettledStake
+,SUM(StandardVoidedStake) AS StandardVoidedStake
+,SUM(RewardVoidedStake) AS RewardVoidedStake
+,SUM(CashoutStakeValue) AS CashoutStakeValue
+,SUM(StandardPayout) AS StandardPayout
+,SUM(RewardPayout) AS RewardPayout
+,SUM(CashoutPayout) AS CashoutPayout
+,SUM(Profit) AS Profit
+,SUM(Revenue) AS Revenue
+
+FROM
+
+(SELECT
+-- DIMENSIONS
+reportingdate,  -- Date 
+b.CustomerKey,  -- ID for customers -- KEY to DW.Customer
+b.SegmentKey,
+b.CouponID,
+CountryKey,
+CONVERT(VARCHAR(64), HASHBYTES('SHA2_256', 
+CONCAT(
+IsMobileBet, '|', 
+MAX(CAST(IsLiveBet AS INT)), '|',
+MAX(NumberOfSelections), '|',
+MAX(CouponTypeKey), '|',
+MAX(BetSettledStatus), '|',
+CASE WHEN MAX(BetSelectionTypeKey) > 1 THEN 2 ELSE 1 END, '|',
+MAX(BonusTypeKey), '|',
+MAX(CashoutParticipation))), 2) AS key_betdetails,
+CONVERT(VARCHAR(64), HASHBYTES('SHA2_256', 
+CONCAT(
+MAX(BetStakeEURBucketKey), '|', 
+CASE WHEN MAX(SelectionsBucket) = 999 THEN MIN(SelectionsBucket) ELSE MAX(SelectionsBucket) END)), 2) 
+AS key_betbucket,
+0 AS BetGroupKey,  -- KEY to DW.BetGroup
+NULL AS Odds,
+-- MEASURES
+SUM(BSStandardSettledStake) AS StandardSettledStake,
+SUM(BSRewardSettledStake) AS RewardSettledStake,
+SUM(BSStandardVoidedStake) AS StandardVoidedStake,
+SUM(BSRewardVoidedStake) AS RewardVoidedStake,
+SUM(CashoutStakeValue) AS CashoutStakeValue,
+SUM(BSStandardPayout) AS StandardPayout,
+SUM(BSRewardPayout) AS RewardPayout,
+SUM(BSCashout) AS CashoutPayout,
+SUM(BSProfit) AS Profit,
+SUM(BSRevenue) AS Revenue  
+
+FROM MARTCUBE.BetSelectionFlat b WITH(NOLOCK) 
+INNER JOIN dw.Customer c WITH(NOLOCK) ON b.customerkey = c.customerkey  
+
+WHERE 
+betsettledstatus IN (3, 4, 5, 6, 7)
+AND b.AccountTypeKey = 1
+AND CouponTypeKey<>1
+
+GROUP BY
+reportingdate,  -- Date
+CountryKey,  -- KEY to DW.Country
+b.CustomerKey,  -- ID for customers -- KEY to DW.Customer
+b.SegmentKey,  -- KEY to DW.Segment
+b.CouponID,
+IsMobileBet  -- Device
+) main
+
+GROUP BY
+reportingdate
+,CustomerKey
 ,SegmentKey
 ,CountryKey
 ,key_betdetails
