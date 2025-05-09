@@ -16,7 +16,9 @@ CashoutParticipation)), 2)
 AS key_betdetails
 ,s.BetSelectionOdds													-- Odds
 ,BetSelectionOddsBucketKey
-,s.EventKey															-- KEY to DW.Event
+,e.EventName														
+,e.EventDeadline
+,e.SubCategoryKey
 ,BetGroupKey														-- KEY to DW.BetGroup
 
 --MEASURES		
@@ -33,11 +35,11 @@ AS key_betdetails
 
 FROM MARTCUBE.BetSelectionFlat s
 INNER JOIN dw.Customer c WITH(NOLOCK) ON s.customerkey = c.customerkey --WITH(NOLOCK)
+INNER JOIN dw.Event e WITH(NOLOCK) ON s.eventkey = e.eventkey --WITH(NOLOCK)
 
 WHERE 
 betsettledstatus IN (3, 4, 5, 6, 7)
 AND s.AccountTypeKey = 1
-AND ReportingDate='2025-01-01'
 
 GROUP BY
 reportingdate														-- Date
@@ -51,7 +53,9 @@ reportingdate														-- Date
 ,NumberOfSelections													-- BetType, 1=single 2=combi
 ,CouponTypeKey														-- KEY to DW.CouponType
 ,BetGroupKey														-- KEY to DW.BetGroup
-,s.EventKey															-- KEY to DW.Event
 ,BetSelectionTypeKey												-- KEY to DW.BetSelectionType
 ,BonusTypeKey														-- KEY to DW.BonusType
 ,CashoutParticipation
+,e.EventName														
+,e.EventDeadline
+,e.SubCategoryKey
