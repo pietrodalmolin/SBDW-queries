@@ -1,25 +1,23 @@
 SELECT
---DIMENSIONS
-reportingdate														-- Date
-,s.SegmentKey
+-- DIMENSIONS
+reportingdate			
+,s.SegmentKey			
 ,CountryKey
-,CONVERT(VARCHAR(64), HASHBYTES('SHA2_256', 
-CONCAT(
-IsMobileBet, '|', 
-IsLiveBet, '|',
-NumberOfSelections, '|',
-CouponTypeKey, '|',
-BSSettledStatus, '|',
-BetSelectionTypeKey, '|',
-BonusTypeKey, '|',
-CashoutParticipation)), 2) 
-AS key_betdetails
-,s.BetSelectionOdds													-- Odds
+,(CAST(IsMobileBet AS INT)) AS IsMobileBet
+,(CAST(IsLiveBet AS INT)) AS IsLiveBet
+,NumberOfSelections
+,CouponTypeKey
+,BSSettledStatus
+,BetSelectionTypeKey
+,BonusTypeKey
+,CashoutParticipation
+,s.BetSelectionOdds
 ,BetSelectionOddsBucketKey
-,e.EventName														
+,e.EventName											
 ,e.EventDeadline
 ,e.SubCategoryKey
-,BetGroupKey														-- KEY to DW.BetGroup
+,BetGroupKey
+,CustomerClassificationAtBetPlacement
 
 --MEASURES		
 ,SUM(BSStandardSettledStake) AS StandardSettledStake
@@ -34,8 +32,8 @@ AS key_betdetails
 ,SUM(BSRevenue) AS Revenue	
 
 FROM MARTCUBE.BetSelectionFlat s
-INNER JOIN dw.Customer c WITH(NOLOCK) ON s.customerkey = c.customerkey --WITH(NOLOCK)
-INNER JOIN dw.Event e WITH(NOLOCK) ON s.eventkey = e.eventkey --WITH(NOLOCK)
+INNER JOIN dw.Customer c ON s.customerkey = c.customerkey 
+INNER JOIN dw.Event e ON s.eventkey = e.eventkey
 
 WHERE 
 betsettledstatus IN (3, 4, 5, 6, 7)
@@ -59,3 +57,4 @@ reportingdate														-- Date
 ,e.EventName														
 ,e.EventDeadline
 ,e.SubCategoryKey
+,CustomerClassificationAtBetPlacement
