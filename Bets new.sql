@@ -80,14 +80,13 @@ reportingdate
 ,SUM(BSProfit) AS Profit
 ,SUM(BSRevenue) AS Revenue  
 
-FROM MARTCUBE.BetSelectionFlat b WITH(NOLOCK) 
-INNER JOIN dw.Customer c WITH(NOLOCK) ON b.customerkey = c.customerkey  
+FROM MARTCUBE.BetSelectionFlat b
+INNER JOIN dw.Customer c ON b.customerkey = c.customerkey  
 
 WHERE 
 betsettledstatus IN (3, 4, 5, 6, 7)
 AND b.AccountTypeKey = 1
 AND CouponTypeKey=1
-AND ReportingDate='2025-05-01'
 
 GROUP BY
 reportingdate,
@@ -210,14 +209,13 @@ reportingdate
 ,SUM(BSProfit) AS Profit
 ,SUM(BSRevenue) AS Revenue  
 
-FROM MARTCUBE.BetSelectionFlat b WITH(NOLOCK) 
-INNER JOIN dw.Customer c WITH(NOLOCK) ON b.customerkey = c.customerkey  
+FROM MARTCUBE.BetSelectionFlat b
+INNER JOIN dw.Customer c ON b.customerkey = c.customerkey  
 
 WHERE 
 betsettledstatus IN (3, 4, 5, 6, 7)
 AND b.AccountTypeKey = 1
 AND CouponTypeKey<>1
-AND ReportingDate='2025-05-01'
 
 GROUP BY
 reportingdate,
